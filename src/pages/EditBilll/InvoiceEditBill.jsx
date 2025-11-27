@@ -196,7 +196,7 @@ function formatDate(date) {
       await generateSingleCopy(doc, detail, copyType, billType, logoBase64);
     }
   
-    const fileName = `TAX INVOICE-${detail.invoiceNumber}-25.pdf`;
+    const fileName = `BILL-${detail.invoiceNumber}-25.pdf`;
     doc.save(fileName);
   };
   
@@ -521,7 +521,7 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 2);
         
           <div className="all-bills-page">
               <MobileNavbar/>
-            <h1>Edit Invoice Bills</h1>
+            <h1>Edit Bills</h1>
             <table className="products-table">
               <thead>
                 <tr>

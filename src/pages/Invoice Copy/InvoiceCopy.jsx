@@ -126,7 +126,7 @@ const generateAllCopiesPDF = async (detail, billType, logoBase64) => {
     await generateSingleCopy(doc, detail, copyType, billType, logoBase64);
   }
 
-  const fileName = `TAX INVOICE-${detail.invoiceNumber}-25.pdf`;
+  const fileName = `BILL-${detail.invoiceNumber}-25.pdf`;
   doc.save(fileName);
 };
 
