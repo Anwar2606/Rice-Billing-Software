@@ -1,4 +1,4 @@
-.chart-container {
+.sales-chart-box {
   width: 100%;
   max-width: 900px;
   margin: 20px auto;
@@ -6,11 +6,10 @@
   padding: 20px;
   padding-bottom: 40px;
   border-radius: 8px;
-  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
 }
 
-/* Chart title */
-.chart-header {
+/* Title */
+.sales-chart-title {
   font-size: 22px;
   font-weight: bold;
   color: #1b2594;
@@ -18,39 +17,39 @@
   margin-bottom: 15px;
 }
 
-/* Chart wrapper ensures fixed height */
-.chart-wrapper {
+/* Chart fixed height wrapper */
+.sales-chart-area {
   width: 100%;
   height: 280px;
 }
 
-/* 📱 MOBILE RESPONSIVE */
+/* Responsive */
 @media (max-width: 768px) {
-  .chart-container {
+  .sales-chart-box {
     width: 94%;
     padding: 15px;
   }
 
-  .chart-header {
+  .sales-chart-title {
     font-size: 18px;
   }
 
-  .chart-wrapper {
+  .sales-chart-area {
     height: 240px;
   }
 }
 
 @media (max-width: 480px) {
-  .chart-container {
+  .sales-chart-box {
     padding: 12px;
     width: 95%;
   }
 
-  .chart-header {
+  .sales-chart-title {
     font-size: 16px;
   }
 
-  .chart-wrapper {
+  .sales-chart-area {
     height: 220px;
   }
 }

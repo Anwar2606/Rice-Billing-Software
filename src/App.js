@@ -38,6 +38,7 @@ import WholesaleEditBillPage from './pages/Edit Wholesale Copy/EditWholesaleCopy
 import WayBillCopy from './pages/Way bill copy/WayBillCopy';
 import WayBillEditBillPage from './pages/Edit Waybill/EditWayBill';
 import EditCustomer from './pages/Edit Customer/EditCustomer';
+import MyBarChart from './pages/My Chart/Mychart';
 
 
 
@@ -91,7 +92,7 @@ const isBillingPage = location.pathname === '/invoicebill' || location.pathname 
         <Route path="/downloadbill" element={<DownloadBillingData />} />
         <Route path="/addTransport" element={<AddTransportDetails />}/>
           <Route path="/add" element={<AddProduct />} />
-          <Route path="/newhome" element={<NewHome />} />
+          <Route path="/dashboard" element={<NewHome />} />
           <Route path="/" element={<LoginPage />} />
           <Route path="/pdf" element={<MergePDFs />} />
           <Route path="/showtransport" element={<ShowTransportDetails />} />
@@ -112,6 +113,7 @@ const isBillingPage = location.pathname === '/invoicebill' || location.pathname 
           <Route path="/retailcalculator" element={<RetailCalculator />} />
           <Route path="/allbills" element={<AllBillsPage />} />
           <Route path="/graph" element={<GraphComponent />} />
+           <Route path="/mychart" element={<MyBarChart />} />
           <Route path="/invoicebill" element={<BillingCalculator />} />
           <Route path="/multipleproducts" element={<MultipleProducts />} />
           <Route path="/bulkupload" element={<BulkUpload />} />

@@ -17,11 +17,32 @@ import { GrDocumentPdf } from "react-icons/gr";
 import { IoDocumentTextOutline, IoPersonCircleSharp } from "react-icons/io5";
 import Logo from "../assets/PCW.png"; // Update path if needed
 import MyLogo from '../assets/annakshi-logo.jpg';
+import { useEffect } from "react";
+import { db } from "../firebase";
+import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
 
 const Sidebar = ({ isOpen,isOpen2, toggleSidebar }) => {
   const [invoiceOpen, setInvoiceOpen] = useState(false);
    const [isBillsOpen, setIsBillsOpen] = useState(false);
    const [isBillsOpen2, setIsBillsOpen2] = useState(false);
+   const [lastInvoiceNumber, setLastInvoiceNumber] = useState(null);
+  useEffect(() => {
+   const q = query(
+     collection(db, "invoicebilling"),
+     orderBy("createdAt", "desc"),
+     limit(1)
+   );
+ 
+   // 🔥 Real-time listener (auto update)
+   const unsubscribe = onSnapshot(q, (snapshot) => {
+     if (!snapshot.empty) {
+       setLastInvoiceNumber(snapshot.docs[0].data().invoiceNumber);
+     }
+   });
+ 
+   return () => unsubscribe(); // cleanup listener
+ }, []);
+ 
   const toggleBillsSubMenu = () => {
     setIsBillsOpen(!isBillsOpen);
   };
@@ -39,12 +60,23 @@ const toggleBillsSubMenu2 = () => {
             </div>
           )}
         </li>
-        <li><Link to="/newhome"><FaHome /> {isOpen && <span>Home</span>}</Link></li>
+        <li><Link to="/dashboard"><FaHome /> {isOpen && <span>Home</span>}</Link></li>
         <li><Link to="/products"><AiFillProduct /> {isOpen && <span>Products</span>}</Link></li>
         <li><Link to="/invoicecopy"><HiOutlineDocumentText />{isOpen && <span>All Bill</span>} </Link></li>
         <li><Link to="/invoiceeditbill"><HiOutlineDocumentText />{isOpen && <span>Edit Bill</span>} </Link></li>
         <li><Link to="/invoicebill"><LiaMoneyBillWaveAltSolid />{isOpen && <span>Generate Bill </span>} </Link></li>
-         <li><Link to="/showcustomers"><IoPersonCircleSharp />{isOpen && <span>Customer</span>} </Link></li>
+         {/* <li><Link to="/showcustomers"><IoPersonCircleSharp />{isOpen && <span>Customer</span>} </Link></li> */}
+         <li>
+  <Link to="/invoice">
+    <FaFileInvoice />
+    {isOpen && (
+      <span style={{ fontWeight: "600", marginLeft: "6px" }}>
+        Last Bill Number: {lastInvoiceNumber ?? "Loading..."}
+      </span>
+    )}
+  </Link>
+</li>
+
         {/* <li><Link to="/allbills"><FaEye /> {isOpen && <span>All Bills</span>}</Link></li>
          <li onClick={toggleBillsSubMenu} style={{ cursor: 'pointer' }}>
         <FaEye /> {isOpen && <span>All Bills ▾</span>}

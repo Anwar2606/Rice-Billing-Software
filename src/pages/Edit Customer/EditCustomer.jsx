@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../../pages/firebase";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Sidebar from "../Sidebar/Sidebar";
 import './EditCustomer.css';
+import MobileNavbar from "../Mobile Navbar/MobileNavbar";
 
 const EditCustomer = () => {
   const { id } = useParams();
@@ -12,11 +13,11 @@ const EditCustomer = () => {
   const [customer, setCustomer] = useState({
     customerName: "",
     customerAddress: "",
-    customerState: "",
+    // customerState: "",
     customerPhoneNo: "",
-    customerGSTIN: "",
-    customerPan: "",
-    customerEmail: "",
+    // customerGSTIN: "",
+    // customerPan: "",
+    // customerEmail: "",
   });
 
   const toggleSidebar = () => setIsOpen(!isOpen);
@@ -58,6 +59,7 @@ const EditCustomer = () => {
     <div className="main-container2">
       {/* Sidebar */}
       <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
+<MobileNavbar/>
 
       {/* Main Content */}
       <div className="content">

@@ -6,6 +6,7 @@ import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import Sidebar from "../Sidebar/Sidebar";
 import "./ShowCustomers.css";
+import MobileNavbar from "../Mobile Navbar/MobileNavbar";
 
 const ShowCustomers = () => {
   const [customers, setCustomers] = useState([]);
@@ -51,29 +52,7 @@ const ShowCustomers = () => {
 
       <div className="content">
         <div className="all-bills-page">
-          <div className="mobile-navbar">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="mobile-nav-btn"
-            >
-              ☰ Menu
-            </button>
-          
-          
-          </div>
-          
-          {/* 📱 MOBILE MENU (Show when isOpen = true) */}
-          {isOpen && (
-            <div className="mobile-menu">
-              <ul>
-                <li><Link to="/newhome">Dashboard</Link></li>
-                <li><Link to="/invoicecopy">All Bill</Link></li>
-                <li><Link to="/billing">Edit  Bill</Link></li>
-                <li><Link to="/customers">Generate Bill</Link></li>
-                <li><Link to="/customers">Add Cutsomer Details</Link></li>
-              </ul>
-            </div>
-          )}
+          <MobileNavbar/>
           <div className="header-row">
             <h1>Customer Details</h1>
             <button className="add-customer-btn" onClick={() => navigate("/addcustomer")}>

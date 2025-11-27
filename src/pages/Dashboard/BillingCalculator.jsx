@@ -413,7 +413,7 @@ doc.setFont('helvetica', 'bold');
 doc.text('110,Javuli Kadai Street.', startX + 30, headerStartY + 5 + lineSpacing);
 doc.text('Sivakasi,', startX + 30, headerStartY + 5 + 2 * lineSpacing);
 doc.text('Virudhunagar.', startX + 30, headerStartY + 5 + 3 * lineSpacing);
-doc.text('State: 33-Tamil Nadu', startX + 30, headerStartY + 5 + 4 * lineSpacing);
+doc.text('State: Tamil Nadu', startX + 30, headerStartY + 5 + 4 * lineSpacing);
 
 // Right side Invoice Info
 doc.setFont('helvetica', 'bold');
@@ -496,16 +496,16 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 4);
   const tableBody = cart.map((item, index) => [
     index + 1,
     item.name,
-    '36041000 ',
+    
     item.quantity.toString(),
     `Rs. ${item.saleprice.toFixed(2)}`,
     `Rs. ${(item.saleprice * item.quantity).toFixed(2)}`
   ]);
 
   tableBody.push(
-    [{ content: 'Total Amount:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.totalAmount)}.00`],
-    [{ content: `Discount (${billingDetails.discountPercentage}%):`, colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.totalAmount * (parseFloat(billingDetails.discountPercentage) / 100)).toFixed(2)}`],
-    [{ content: 'Sub Total:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.discountedTotal)}.00`]
+    [{ content: 'Total Amount:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.totalAmount)}.00`],
+    // [{ content: `Discount (${billingDetails.discountPercentage}%):`, colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.totalAmount * (parseFloat(billingDetails.discountPercentage) / 100)).toFixed(2)}`],
+    [{ content: 'Sub Total:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.discountedTotal)}.00`]
   );
 
   // if (taxOption === 'cgst_sgst') {
@@ -524,10 +524,10 @@ const totalQuantity = cart.reduce((sum, item) => {
   return sum + (isNaN(quantity) ? 0 : quantity);
 }, 0);
   tableBody.push(
-    [{ content: 'Grand Total:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.grandTotal)}.00`],
+    [{ content: 'Grand Total:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.grandTotal)}.00`],
      [
 
-    { content: 'Total Quantity:', colSpan: 3, styles: { halign: 'right', fontStyle: 'bold' } },
+    { content: 'Total Quantity:', colSpan: 2, styles: { halign: 'right', fontStyle: 'bold' } },
     `${totalQuantity}`
   ]
   );
@@ -547,7 +547,7 @@ const totalQuantity = cart.reduce((sum, item) => {
   //     );
 
 doc.autoTable({
-  head: [['S.No', 'Product Name', 'HSN Code', 'Quantity', 'Rate Per Price', 'Total']],
+  head: [['S.No', 'Product Name', 'Quantity', 'Rate Per Price', 'Total']],
   body: tableBody,
   startY,
   theme: 'grid',
@@ -577,9 +577,11 @@ doc.autoTable({
   doc.text(`Rupees: ${grandTotalInWords}`, borderMargin + 5, startY);
 
   const terms = [
-  '1. Goods once sold will not be taken back.',
-  '2. All matters Subject to "Sivakasi" jurisdiction only.',
-  '3. Certified that the particulars given above are true and correct.'
+   '1.Goods once sold will not be taken back or exchanged.',
+'2.Annakshi is not responsible for improper storage after purchase',
+ '3.All prices are inclusive of packing.',
+ '4.Delivery (if applicable) is subject to availability and delivery charges.',
+
 ];
 
 const padding = 10;
@@ -630,7 +632,7 @@ const handleGenerateAllCopies = async () => {
     generatePDFPage(doc, copyTypes[i], invoiceNumber, MyLogo); // <-- pass base64 logo
   }
 
-  doc.save(`TAX INVOICE-${invoiceNumber}-25.pdf`);
+  doc.save(`BILL-${invoiceNumber}-25.pdf`);
 };
 
 
@@ -1102,15 +1104,15 @@ return (
       {/* Billing Summary */}
       <div className="billing-summary">
         <div className="billing-details">
-          <label>Invoice Number</label>
+          <label>Bill Number</label>
           <input
             type="text"
-            placeholder="Enter Invoice Number"
+            placeholder="Enter Bill Number"
             value={manualInvoiceNumber}
             onChange={(e) => setManualInvoiceNumber(e.target.value)}
             required
           />
-          <label>Discount (%)</label>
+          {/* <label>Discount (%)</label>
           <input
           
             type="text"
@@ -1118,7 +1120,7 @@ return (
             onChange={handleDiscountChange}
             min="0"
             max="100"
-          />
+          /> */}
 
           <label>Date</label>
           <input
@@ -1147,10 +1149,10 @@ return (
                 <td>Total Amount:</td>
                 <td>Rs. {billingDetails.totalAmount.toFixed(2)}</td>
               </tr>
-              <tr>
+              {/* <tr>
                 <td>Discounted Total:</td>
                 <td>Rs. {billingDetails.discountedTotal.toFixed(2)}</td>
-              </tr>
+              </tr> */}
               {/* {taxOption === "cgst_sgst" && (
                 <>
                   <tr>
@@ -1177,7 +1179,7 @@ return (
           </table>
         </div>
       </div>
-      <div className="customer-search">
+      {/* <div className="customer-search">
   <input
         type="text"
         placeholder="Search Customers"
@@ -1208,7 +1210,7 @@ return (
 
 
 
-    </div>
+    </div> */}
       
   <div className="customer-search">
       {/* <input

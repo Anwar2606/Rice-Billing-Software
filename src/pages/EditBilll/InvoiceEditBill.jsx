@@ -5,6 +5,7 @@ import { FaDownload, FaEdit, FaTruck } from 'react-icons/fa'; // For Edit icon
 import { jsPDF } from 'jspdf'; // Import jsPDF for generating PDFs
 import './InvoiceEditBill.css';
 import Sidebar from '../Sidebar/Sidebar';
+import MobileNavbar from '../Mobile Navbar/MobileNavbar';
 
 // Replace with your Base64 font string
 const InvoiceEditBillPage = () => {
@@ -26,7 +27,7 @@ const InvoiceEditBillPage = () => {
     };
     fetchProducts();
   }, []);
-  useEffect(() => {
+ useEffect(() => {
   const fetchBills = async () => {
     try {
       const billingSnapshot = await getDocs(collection(db, 'invoicebilling'));
@@ -34,12 +35,11 @@ const InvoiceEditBillPage = () => {
 
       const allBills = [...billingData];
 
-      // 🔹 Sort bills by invoice number (convert to number if stored as string)
+      // 🔥 Sort invoice numbers in descending order
       const sortedBills = allBills.sort((a, b) => {
         const invA = parseInt(a.invoiceNumber, 10);
         const invB = parseInt(b.invoiceNumber, 10);
-        return invA - invB; // ascending order
-        // return invB - invA; // 👉 for descending order (latest invoice first)
+        return invB - invA;   // DESCENDING (LATEST FIRST)
       });
 
       setBills(sortedBills);
@@ -50,6 +50,7 @@ const InvoiceEditBillPage = () => {
 
   fetchBills();
 }, []);
+
 
 useEffect(() => {
   const fetchProducts = async () => {
@@ -356,7 +357,7 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 2);
   const tableBody = productsDetails.map((item, index) => [
     index + 1,
     item.name || 'N/A',
-    '36041000',
+    // '36041000',
     item.quantity?.toString() || '0',
     `Rs. ${item.saleprice?.toFixed(2) || '0.00'}`,
     `Rs. ${(item.quantity * item.saleprice).toFixed(2)}`
@@ -365,20 +366,20 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 2);
   const discountAmt = (totalAmount * (parseFloat(discountPercentage) / 100)).toFixed(2);
 
   tableBody.push(
-    [{ content: 'Total Amount:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(totalAmount)}.00`],
-    [{ content: `Discount (${discountPercentage}%):`, colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, discountAmt],
-    [{ content: 'Sub Total:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(discountedTotal)}.00`],
+    [{ content: 'Total Amount:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(totalAmount)}.00`],
+    // [{ content: `Discount (${discountPercentage}%):`, colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, discountAmt],
+    [{ content: 'Sub Total:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(discountedTotal)}.00`],
     // [{ content: 'CGST @ 9%:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${parseFloat(cgstAmount).toFixed(2)}`],
     // [{ content: 'SGST @ 9%:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${parseFloat(sgstAmount).toFixed(2)}`],
     // [{ content: 'IGST @ 18%:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${parseFloat(igstAmount).toFixed(2)}`],
-    [{ content: 'Grand Total:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(grandTotal)}.00`],
+    [{ content: 'Grand Total:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(grandTotal)}.00`],
     // [{ content: 'Despatched From:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, despatchedFrom || 'N/A'],
     // [{ content: 'Despatched To:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, despatchedTo || 'N/A'],
     // [{ content: 'Transport Name:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, transportName || 'N/A']
   );
 
   doc.autoTable({
-    head: [['S.No', 'Product Name', 'HSN Code', 'Quantity', 'Rate Per Price', 'Total']],
+    head: [['S.No', 'Product Name',  'Quantity', 'Rate Per Price', 'Total']],
     body: tableBody,
     startY,
     theme: 'grid',
@@ -398,9 +399,10 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 2);
   doc.text(`Rupees: ${grandTotalInWords.toUpperCase()}`, borderMargin + 5, currentY);
 
   const terms = [
-    '1. Goods once sold will not be taken back.',
-    '2. All matters Subject to "Sivakasi" jurisdiction only.',
-    '3. Certified that the particulars given above are true and correct.'
+    '1.Goods once sold will not be taken back or exchanged.',
+'2.Annakshi is not responsible for improper storage after purchase',
+ '3.All prices are inclusive of packing.',
+ '4.Delivery (if applicable) is subject to availability and delivery charges.',
   ];
 
   const padding = 10;
@@ -516,7 +518,9 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 2);
           <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
 
         <div className="content">
+        
           <div className="all-bills-page">
+              <MobileNavbar/>
             <h1>Edit Invoice Bills</h1>
             <table className="products-table">
               <thead>
@@ -563,49 +567,79 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 2);
 
                   <h3>Products in Bill</h3>
                   {updatedDetails.productsDetails.map((product, index) => (
-                    <div key={index}>
-                      <label>Product Name:</label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={product.name || ""}
-                        onChange={(e) =>
-                          handleInputChange(e, index, "product")
-                        }
-                      />
-                      <label>Quantity:</label>
-                      <input
-                        type="number"
-                        name="quantity"
-                        value={product.quantity || ""}
-                        onChange={(e) =>
-                          handleInputChange(e, index, "product")
-                        }
-                      />
-                      <label>Price:</label>
-                      <input
-                        type="number"
-                        name="saleprice"
-                        value={product.saleprice || ""}
-                        onChange={(e) =>
-                          handleInputChange(e, index, "product")
-                        }
-                      />
-                      <label>Total:</label>
-                      <input
-                        type="number"
-                        name="total"
-                        value={product.total || 0}
-                        readOnly
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveProduct(index)}
-                      >
-                        Remove
-                      </button>
-                    </div>
+                  <div key={index} className="product-block">
+  
+  {/* FIRST ROW */}
+  <div className="product-row-top">
+    <div>
+      <label>Product Name:</label>
+      <input
+        type="text"
+        name="name"
+        value={product.name || ""}
+        onChange={(e) => handleInputChange(e, index, "product")}
+      />
+    </div>
+
+    <div>
+      <label>Quantity:</label>
+      <input
+        type="number"
+        name="quantity"
+        value={product.quantity || ""}
+        onChange={(e) => handleInputChange(e, index, "product")}
+      />
+    </div>
+
+    <div>
+      <label>Price:</label>
+      <input
+        type="number"
+        name="saleprice"
+        value={product.saleprice || ""}
+        onChange={(e) => handleInputChange(e, index, "product")}
+      />
+    </div>
+  </div>
+
+  {/* SECOND ROW */}
+  <div className="product-row-bottom">
+    <div className="total-box">
+      <label>Total:</label>
+      <input
+        type="number"
+        name="total"
+        value={product.total || 0}
+        readOnly
+      />
+    </div>
+
+    <button
+      type="button"
+      className="remove-btn"
+      onClick={() => handleRemoveProduct(index)}
+    >
+      Remove
+    </button>
+  </div>
+
+</div>
+
                   ))}
+  <label>Total Amount:</label>
+                  <input
+                    type="number"
+                    name="totalAmount"
+                    value={updatedDetails.totalAmount || ""}
+                    readOnly
+                  />
+                    <label>Grand Total:</label>
+                  <input
+                    type="number"
+                    name="grandTotal"
+                    value={updatedDetails.grandTotal || ""}
+                    readOnly
+                  />
 
                   <h3>Available Products</h3>
                   <table className="products-table">
@@ -631,13 +665,7 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 2);
                     </tbody>
                   </table>
 
-                  <label>Total Amount:</label>
-                  <input
-                    type="number"
-                    name="totalAmount"
-                    value={updatedDetails.totalAmount || ""}
-                    readOnly
-                  />
+                
                   {/* <label>CGST (9%):</label>
                   <input
                     type="number"
@@ -652,16 +680,12 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 2);
                     value={updatedDetails.sgstAmount || ""}
                     readOnly
                   /> */}
-                  <label>Grand Total:</label>
-                  <input
-                    type="number"
-                    name="grandTotal"
-                    value={updatedDetails.grandTotal || ""}
-                    readOnly
-                  />
+                
+                  <div className="modal-actions">
+  <button className="save-btn" onClick={handleSubmit}>Save</button>
+  <button className="cancel-btn" onClick={() => setIsModalOpen(false)}>Cancel</button>
+</div>
 
-                  <button onClick={handleSubmit}>Save</button>
-                  <button onClick={() => setIsModalOpen(false)}>Cancel</button>
                 </div>
               </div>
             )}

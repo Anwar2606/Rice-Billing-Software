@@ -10,6 +10,7 @@ import Logo from "../assets/PCW.png"; // Adjust the path as per your project
 import { IoIosPerson } from "react-icons/io";
 import Sidebar from "../Sidebar/Sidebar";
 import './AddCustomer.css';
+import MobileNavbar from "../Mobile Navbar/MobileNavbar";
 const AddCustomer = () => {
   const [isOpen, setIsOpen] = useState(true); // Sidebar state
   const [customerDetails, setCustomerDetails] = useState({
@@ -54,34 +55,13 @@ const AddCustomer = () => {
 
   return (
   <div className="customer-main">
-    <div className="mobile-navbar">
-  <button
-    onClick={() => setIsOpen(!isOpen)}
-    className="mobile-nav-btn"
-  >
-    ☰ Menu
-  </button>
-
-
-</div>
-
-{/* 📱 MOBILE MENU (Show when isOpen = true) */}
-{isOpen && (
-  <div className="mobile-menu">
-    <ul>
-      <li><Link to="/newhome">Dashboard</Link></li>
-      <li><Link to="/invoicecopy">All Bill</Link></li>
-      <li><Link to="/billing">Edit  Bill</Link></li>
-      <li><Link to="/customers">Generate Bill</Link></li>
-      <li><Link to="/customers">Add Cutsomer Details</Link></li>
-    </ul>
-  </div>
-)}
+   
     <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
 
     <div className="customer-content">
       
       <div className="customer-card">
+        <MobileNavbar/>
         <h2 className="customer-title">Add Customer</h2>
 
         <form onSubmit={handleSubmit} className="customer-form">

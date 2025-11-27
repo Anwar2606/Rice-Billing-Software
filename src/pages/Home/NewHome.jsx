@@ -24,6 +24,8 @@ import { db } from "../firebase";
 import SalesComparisonChart from "../Chart/SalesComparisonChart";
 import { Link } from "react-router-dom";
 import Sidebar from "../Sidebar/Sidebar";
+import MobileNavbar from "../Mobile Navbar/MobileNavbar";
+import MyBarChart from "../My Chart/Mychart";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -34,6 +36,8 @@ const NewHome = () => {
     const [todaySales, setTodaySales] = useState(0);
     const [monthSales, setMonthSales] = useState(0);
     const [monthlySales, setMonthlySales] = useState(Array(12).fill(0));
+    const [lastMonthTotal, setLastMonthTotal] = useState(0);
+const [thisMonthTotal, setThisMonthTotal] = useState(0);
 
     useEffect(() => {
         const fetchCustomerCount = async () => {
@@ -77,48 +81,73 @@ const NewHome = () => {
 
     fetchTodaySales();
   }, []);
+  useEffect(() => {
+  const fetchTotalBills = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, "invoicebilling"));
+      setTotalBills(snapshot.size);
+    } catch (error) {
+      console.error("Error fetching total bills:", error);
+    }
+  };
 
-    useEffect(() => {
-        const fetchBills = async () => {
-            try {
-                const billsCollection = collection(db, "invoicebilling");
-                const billsSnapshot = await getDocs(billsCollection);
+  fetchTotalBills();
+}, []);
 
-                let totalSalesForMonth = 0;
-                const monthlySalesTemp = Array(12).fill(0);
-                const now = new Date();
+useEffect(() => {
+  const fetchMonthSales = async () => {
+    try {
+      const billingRef = collection(db, "invoicebilling");
 
-                billsSnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    if (!data.date || !data.totalAmount) return;
+      const now = new Date();
 
-                    const billDate = data.date.toDate ? data.date.toDate() : new Date(data.date);
-                    const month = billDate.getMonth();
-                    const amount = parseFloat(data.totalAmount ?? 0);
+      // THIS MONTH RANGE
+      const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfThisMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
 
-                    if (!isNaN(amount)) {
-                        monthlySalesTemp[month] += amount;
+      // LAST MONTH RANGE
+      const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
 
-                        if (
-                            billDate.getFullYear() === now.getFullYear() &&
-                            billDate.getMonth() === now.getMonth()
-                        ) {
-                            totalSalesForMonth += amount;
-                        }
-                    }
-                });
+      // Query THIS MONTH
+      const qThisMonth = query(
+        billingRef,
+        where("createdAt", ">=", startOfThisMonth),
+        where("createdAt", "<=", endOfThisMonth)
+      );
 
-                setTotalBills(billsSnapshot.size);
-                setMonthSales(totalSalesForMonth);
-                setMonthlySales(monthlySalesTemp);
-            } catch (error) {
-                console.error("Error fetching bills:", error);
-            }
-        };
+      // Query LAST MONTH
+      const qLastMonth = query(
+        billingRef,
+        where("createdAt", ">=", startOfLastMonth),
+        where("createdAt", "<=", endOfLastMonth)
+      );
 
-        fetchBills();
-    }, []);
+      const snapThisMonth = await getDocs(qThisMonth);
+      const snapLastMonth = await getDocs(qLastMonth);
 
+      let thisMonthTotalValue = 0;
+      snapThisMonth.forEach((doc) => {
+        thisMonthTotalValue += doc.data().totalAmount || 0;
+      });
+
+      let lastMonthTotalValue = 0;
+      snapLastMonth.forEach((doc) => {
+        lastMonthTotalValue += doc.data().totalAmount || 0;
+      });
+
+      setThisMonthTotal(thisMonthTotalValue);
+      setLastMonthTotal(lastMonthTotalValue);
+
+    } catch (error) {
+      console.error("Error fetching month sales:", error);
+    }
+  };
+
+  fetchMonthSales();
+}, []);
+
+   
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
@@ -129,29 +158,7 @@ const NewHome = () => {
         <div className="main-container">
             <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
             <div className="content-container">
-                <div className="mobile-navbar">
-                  <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="mobile-nav-btn"
-                  >
-                    ☰ Menu
-                  </button>
-                
-                
-                </div>
-                
-                {/* 📱 MOBILE MENU (Show when isOpen = true) */}
-                {isOpen && (
-                  <div className="mobile-menu">
-                    <ul>
-                      <li><Link to="/newhome">Dashboard</Link></li>
-                      <li><Link to="/invoicecopy">All Bill</Link></li>
-                      <li><Link to="/billing">Edit  Bill</Link></li>
-                      <li><Link to="/customers">Generate Bill</Link></li>
-                      <li><Link to="/customers">Add Cutsomer Details</Link></li>
-                    </ul>
-                  </div>
-                )}
+                <MobileNavbar isOpen={isOpen} toggleSidebar={() => setIsOpen(!isOpen)} />
                 <div className="card-container">
                     <div className="card">
                         <div className="text-container">
@@ -172,28 +179,29 @@ const NewHome = () => {
                         </div>
                     </div>
                     <div className="card">
-                        <div className="text-container">
-                            <h3>Today Sales</h3>
-                            <p>₹{todaySales.toFixed(2)}</p>
-                        </div>
-                        <div className="image-container">
-                            <img src={Card3} alt="Card 3" />
-                        </div>
-                    </div>
-                    <div className="card">
-                        <div className="text-container">
-                            <h3>This Month</h3>
-                            <p>₹{monthSales.toFixed(2)}</p>
-                        </div>
-                        <div className="image-container">
-                            <img src={Card22} alt="Card 4" />
-                        </div>
-                    </div>
+  <div className="text-container">
+    <h3>Last Month</h3>
+    <p>₹{lastMonthTotal.toFixed(2)}</p>
+  </div>
+  <div className="image-container">
+    <img src={Card3} alt="Card 3" />
+  </div>
+</div>
+
+<div className="card">
+  <div className="text-container">
+    <h3>This Month</h3>
+    <p>₹{thisMonthTotal.toFixed(2)}</p>
+  </div>
+  <div className="image-container">
+    <img src={Card22} alt="Card 4" />
+  </div>
+</div>
+
                 </div>
 
-                <div className="chart-container">
-    <SalesComparisonChart />
-</div>
+               
+    <MyBarChart />
 
             </div>
         </div>

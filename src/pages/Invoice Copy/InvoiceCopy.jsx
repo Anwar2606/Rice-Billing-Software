@@ -16,6 +16,7 @@ import { MdLogout } from 'react-icons/md';
 import { TbListNumbers } from 'react-icons/tb';
 import { IoIosPerson } from 'react-icons/io';
 import Sidebar from '../Sidebar/Sidebar';
+import MobileNavbar from '../Mobile Navbar/MobileNavbar';
 
 const InvoiceCopy = (bill) => {
   const [bills, setBills] = useState([]);
@@ -278,25 +279,27 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 4);
   const tableBody = productsDetails.map((item, index) => [
     index + 1,
     item.name || 'N/A',
-    '36041000',
+    // '36041000',
     item.quantity?.toString() || '0',
     `Rs. ${item.saleprice?.toFixed(2) || '0.00'}`,
     `Rs. ${(item.quantity * item.saleprice).toFixed(2)}`
   ]);
 
   const discountAmt = (totalAmount * (parseFloat(discountPercentage) / 100)).toFixed(2);
-  const totalQuantity = detail.productsDetails.reduce((acc, item) => acc + (item.quantity || 0), 0);
+ const totalQuantity = (detail?.productsDetails ?? [])
+  .reduce((acc, item) => acc + Number(item?.quantity || 0), 0);
+
 
   tableBody.push(
-    [{ content: 'Total Amount:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(totalAmount)}.00`],
-    [{ content: `Discount (${discountPercentage}%):`, colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, discountAmt],
-    [{ content: 'Sub Total:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(discountedTotal)}.00`],
+    [{ content: 'Total Amount:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(totalAmount)}.00`],
+    // [{ content: `Discount (${discountPercentage}%):`, colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, discountAmt],
+    [{ content: 'Sub Total:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(discountedTotal)}.00`],
     // [{ content: 'CGST @ 9%:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${parseFloat(cgstAmount).toFixed(2)}`],
     // [{ content: 'SGST @ 9%:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${parseFloat(sgstAmount).toFixed(2)}`],
     // [{ content: 'IGST @ 18%:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${parseFloat(igstAmount).toFixed(2)}`],
-    [{ content: 'Grand Total:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(grandTotal)}.00`],
+    [{ content: 'Grand Total:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(grandTotal)}.00`],
      [
-    { content: '', colSpan: 3 }, // column 1 & 2 empty
+    { content: '', colSpan: 2 }, // column 1 & 2 empty
     { content: `Total Quantity: ${totalQuantity}`, styles: { halign: 'left', fontStyle: 'bold' } }, // column 3 (index 2)
     { content: '' } // column 4 (index 3)
   ]
@@ -306,7 +309,7 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 4);
   );
 
   doc.autoTable({
-    head: [['S.No', 'Product Name', 'HSN Code', 'Quantity', 'Rate Per Price', 'Total']],
+    head: [['S.No', 'Product Name',  'Quantity', 'Rate Per Price', 'Total']],
     body: tableBody,
     startY,
     theme: 'grid',
@@ -326,9 +329,10 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 4);
   doc.text(`Rupees: ${grandTotalInWords.toUpperCase()}`, borderMargin + 5, currentY);
 
   const terms = [
-    '1. Goods once sold will not be taken back.',
-    '2. All matters Subject to "Sivakasi" jurisdiction only.',
-    '3. Certified that the particulars given above are true and correct.'
+     '1.Goods once sold will not be taken back or exchanged.',
+'2.Annakshi is not responsible for improper storage after purchase',
+ '3.All prices are inclusive of packing.',
+ '4.Delivery (if applicable) is subject to availability and delivery charges.',
   ];
 
   const padding = 10;
@@ -430,7 +434,7 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 4);
       await deleteDoc(billingDocRef);
   
       // Delete from 'customerBilling' collection
-      const customerBillingDocRef = doc(db, 'customerBilling', id);
+      const customerBillingDocRef = doc(db, 'invoicebilling', id);
       await deleteDoc(customerBillingDocRef);
   
       // Update the state to remove the deleted bill from the UI
@@ -452,29 +456,8 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 4);
       <div className="content">
        
         <div className="all-bills-page">
-           <div className="mobile-navbar">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="mobile-nav-btn"
-          >
-            ☰ Menu
-          </button>
-        
-        
-        </div>
-        
-        {/* 📱 MOBILE MENU (Show when isOpen = true) */}
-        {isOpen && (
-          <div className="mobile-menu">
-            <ul>
-              <li><Link to="/newhome">Dashboard</Link></li>
-              <li><Link to="/invoicecopy">All Bill</Link></li>
-              <li><Link to="/billing">Edit  Bill</Link></li>
-              <li><Link to="/customers">Generate Bill</Link></li>
-              <li><Link to="/customers">Add Cutsomer Details</Link></li>
-            </ul>
-          </div>
-        )}<br/>
+          <MobileNavbar/>
+         <br/>
           <h1>Our Bills</h1>
           <div className="date-filter">
           <label style={{ fontSize: '16px', fontWeight: 'bold', marginRight: '10px' }}>

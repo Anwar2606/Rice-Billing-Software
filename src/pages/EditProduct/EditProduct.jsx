@@ -10,6 +10,7 @@ import { MdLogout } from "react-icons/md";
 import Logo from "../assets/PCW.png";
 import { IoIosPerson } from "react-icons/io";
 import Sidebar from "../Sidebar/Sidebar";
+import MobileNavbar from "../Mobile Navbar/MobileNavbar";
 
 const EditProductPage = () => {
   const { id } = useParams();
@@ -71,6 +72,7 @@ const EditProductPage = () => {
       {/* Main Content */}
       <div className="content-container">
         <div className="Edit-page">
+          <MobileNavbar/>
           <h2 className="Page-title">Edit Product</h2>
           <label>Product name:</label>
           <input
@@ -104,7 +106,7 @@ const EditProductPage = () => {
             onChange={(e) => setSalePrice(e.target.value)}
             placeholder="Sale Price"
           />
-          <label>Quantity:</label>
+          <label>Number Of Stocks:</label>
           <input
             className="Edit-input1"
             type="text"

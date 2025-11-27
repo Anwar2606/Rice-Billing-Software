@@ -15,6 +15,7 @@ import "./ProductList.css";
 import Sidebar from "../Sidebar/Sidebar";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import MobileNavbar from "../Mobile Navbar/MobileNavbar";
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -139,31 +140,8 @@ const ProductList = () => {
       <Sidebar isOpen={isOpen} toggleSidebar={() => setIsOpen(!isOpen)} />
       <div className="content-container">
         {/* 📱 MOBILE NAVBAR (Visible only on mobile) */}
-<div className="mobile-navbar">
-  <button
-    onClick={() => setIsOpen(!isOpen)}
-    className="mobile-nav-btn"
-  >
-    ☰ Menu
-  </button>
-
-
-</div>
-
-{/* 📱 MOBILE MENU (Show when isOpen = true) */}
-{isOpen && (
-  <div className="mobile-menu">
-    <ul>
-      <li><Link to="/newhome">Dashboard</Link></li>
-      <li><Link to="/invoicecopy">All Bill</Link></li>
-      <li><Link to="/billing">Edit  Bill</Link></li>
-      <li><Link to="/customers">Generate Bill</Link></li>
-      <li><Link to="/customers">Add Cutsomer Details</Link></li>
-    </ul>
-  </div>
-)}
-
-        <h2 className="product-list-title">Product List</h2>
+<MobileNavbar isOpen={isOpen} toggleSidebar={() => setIsOpen(!isOpen)} />
+        <h2 className="product-list-title">Product List({filteredProducts.length} Products)</h2>
         <input
           type="text"
           className="product-list-input"
