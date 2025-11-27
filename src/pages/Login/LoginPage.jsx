@@ -35,7 +35,7 @@ const Login = () => {
         e.preventDefault();
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            navigate('/newhome'); // Redirect to home page on successful login
+            navigate('/dashboard'); // Redirect to home page on successful login
         } catch (error) {
             toast.error('Incorrect email or password');
         }
