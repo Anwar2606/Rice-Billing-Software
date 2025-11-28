@@ -291,8 +291,9 @@
   color: #333;
 }
 
-.mobile-navbar,
-.mobile-menu {
+
+
+.navbar-container {
   display: none;
 }
 
@@ -304,6 +305,9 @@
     display: none !important;
   }
 
+  .navbar-container {
+    display: block !important;
+  }
 
 
 

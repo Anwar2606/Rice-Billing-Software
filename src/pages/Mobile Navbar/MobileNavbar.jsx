@@ -1,37 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "./MobileNavbar.css"; // Make sure to create/add CSS file
-import { useEffect } from "react";
+import "./MobileNavbar.css";
 import { db } from "../firebase";
 import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 
 const MobileNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
- const [lastInvoiceNumber, setLastInvoiceNumber] = useState(null);
-  useEffect(() => { 
- const fetchLastInvoice = async () => {
-     try {
-       const q = query(
-         collection(db, "invoicebilling"),
-         orderBy("createdAt", "desc"),
-         limit(1)
-       );
- 
-       const snap = await getDocs(q);
- 
-       if (!snap.empty) {
-         setLastInvoiceNumber(snap.docs[0].data().invoiceNumber);
-       }
-     } catch (error) {
-       console.error("Error fetching last invoice:", error);
-     }
-   };
- 
-   fetchLastInvoice();
- }, []);
+  const [lastInvoiceNumber, setLastInvoiceNumber] = useState(null);
+
+  useEffect(() => {
+    const fetchLastInvoice = async () => {
+      try {
+        const q = query(
+          collection(db, "invoicebilling"),
+          orderBy("createdAt", "desc"),
+          limit(1)
+        );
+
+        const snap = await getDocs(q);
+
+        if (!snap.empty) {
+          setLastInvoiceNumber(snap.docs[0].data().invoiceNumber);
+        }
+      } catch (error) {
+        console.error("Error fetching last invoice:", error);
+      }
+    };
+
+    fetchLastInvoice();
+  }, []);
+
   return (
     <>
-      {/* 📱 Top Mobile Navbar */}
+      {/* 📱 Mobile Top Bar */}
       <div className="mobile-navbar">
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -41,7 +42,7 @@ const MobileNavbar = () => {
         </button>
       </div>
 
-      {/* 📲 Mobile Dropdown Menu */}
+      {/* 📲 Dropdown Menu */}
       {isOpen && (
         <div className="mobile-menu">
           <ul>
@@ -50,11 +51,13 @@ const MobileNavbar = () => {
                 Dashboard
               </Link>
             </li>
+
             <li>
               <Link to="/products" onClick={() => setIsOpen(false)}>
                 Products
               </Link>
             </li>
+
             <li>
               <Link to="/invoicecopy" onClick={() => setIsOpen(false)}>
                 All Bill
@@ -73,21 +76,16 @@ const MobileNavbar = () => {
               </Link>
             </li>
 
-            {/* <li>
-              <Link to="/showcustomers" onClick={() => setIsOpen(false)}>
-                Customer Details
-              </Link>
-            </li> */}
+            {/* ⭐ LAST BILL NUMBER */}
             <li>
-              <Link to="/invoice">
-               
-                {isOpen && (
-                  <span style={{ fontWeight: "600", marginLeft: "6px" }}>
-                    Last Bill Number: {lastInvoiceNumber ?? "Loading..."}
-                  </span>
-                )}
+              <Link to="/invoice" onClick={() => setIsOpen(false)}>
+                Last Bill Number:{" "}
+                <span style={{ fontWeight: "600" }}>
+                  {lastInvoiceNumber ?? "Loading..."}
+                </span>
               </Link>
             </li>
+
           </ul>
         </div>
       )}

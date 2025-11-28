@@ -157,10 +157,13 @@ useEffect(() => {
     return (
         <div className="main-container">
             <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
+            <MobileNavbar/>
             <div className="content-container">
-                <MobileNavbar isOpen={isOpen} toggleSidebar={() => setIsOpen(!isOpen)} />
+              
                 <div className="card-container">
+                      
                     <div className="card">
+                        
                         <div className="text-container">
                             <h3>Total Bills</h3>
                             <p>{totalBills}</p>

@@ -16,6 +16,7 @@ import Sidebar from "../Sidebar/Sidebar";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import MobileNavbar from "../Mobile Navbar/MobileNavbar";
+import Navbar from "../Navbar/Navbar";
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -140,7 +141,7 @@ const ProductList = () => {
       <Sidebar isOpen={isOpen} toggleSidebar={() => setIsOpen(!isOpen)} />
       <div className="content-container">
         {/* 📱 MOBILE NAVBAR (Visible only on mobile) */}
-<MobileNavbar isOpen={isOpen} toggleSidebar={() => setIsOpen(!isOpen)} />
+<MobileNavbar/>
         <h2 className="product-list-title">Product List({filteredProducts.length} Products)</h2>
         <input
           type="text"
