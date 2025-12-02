@@ -4,7 +4,9 @@
 
 @media (max-width: 768px) {
 
-
+  .mobile-navbar {
+    display: flex !important;
+  }
     /* -----------------------------------
    📱 MOBILE NAVBAR (CLEAN & PROFESSIONAL)
 ----------------------------------- */
