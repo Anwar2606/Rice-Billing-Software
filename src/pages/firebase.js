@@ -5,12 +5,12 @@ import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
   //testing
-  apiKey: "AIzaSyCTmFMUSQL_lvxZSGzihrx5G7AypB4Uk5Q",
-  authDomain: "testing-855ce.firebaseapp.com",
-  projectId: "testing-855ce",
-  storageBucket: "testing-855ce.appspot.com",
-  messagingSenderId: "1086229411180",
-  appId: "1:1086229411180:web:4a835dadcfb73b08a42f49" 
+  // apiKey: "AIzaSyCTmFMUSQL_lvxZSGzihrx5G7AypB4Uk5Q",
+  // authDomain: "testing-855ce.firebaseapp.com",
+  // projectId: "testing-855ce",
+  // storageBucket: "testing-855ce.appspot.com",
+  // messagingSenderId: "1086229411180",
+  // appId: "1:1086229411180:web:4a835dadcfb73b08a42f49" 
   
     //main
     // apiKey: "AIzaSyD9dhzJrhhENssGVbsGleNDk7ZTBUxsyik",
@@ -28,12 +28,12 @@ const firebaseConfig = {
   // appId: "1:97163152398:web:b02de4e1e085efbca9c05f"
 
   //main db
-// apiKey: "AIzaSyCLaG8mCdYHyZw5vwdt_9hPo5Gs0rYZ31o",
-//   authDomain: "annakshi-billing-software.firebaseapp.com",
-//   projectId: "annakshi-billing-software",
-//   storageBucket: "annakshi-billing-software.firebasestorage.app",
-//   messagingSenderId: "752070281140",
-//   appId: "1:752070281140:web:b23336c2e2e79f6ce9d4e1"
+apiKey: "AIzaSyCLaG8mCdYHyZw5vwdt_9hPo5Gs0rYZ31o",
+  authDomain: "annakshi-billing-software.firebaseapp.com",
+  projectId: "annakshi-billing-software",
+  storageBucket: "annakshi-billing-software.firebasestorage.app",
+  messagingSenderId: "752070281140",
+  appId: "1:752070281140:web:b23336c2e2e79f6ce9d4e1"
 };
 
 const app = initializeApp(firebaseConfig);
