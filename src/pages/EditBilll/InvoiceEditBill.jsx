@@ -6,7 +6,8 @@ import { jsPDF } from 'jspdf'; // Import jsPDF for generating PDFs
 import './InvoiceEditBill.css';
 import Sidebar from '../Sidebar/Sidebar';
 import MobileNavbar from '../Mobile Navbar/MobileNavbar';
-
+import { pdf, PDFDownloadLink } from "@react-pdf/renderer";
+import TamilPDF from "../Dashboard/TamilPDF"; 
 // Replace with your Base64 font string
 const InvoiceEditBillPage = () => {
   const [bills, setBills] = useState([]);
@@ -511,6 +512,39 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 2);
     grandTotal,
   }));
 };
+const handleFastDownload = async (bill) => {
+  const blob = await pdf(
+    <TamilPDF
+      invoiceNumber={bill?.invoiceNumber || ""}
+      cart={
+        Array.isArray(bill?.productsDetails)
+          ? bill.productsDetails
+          : Array.isArray(bill?.cart)
+          ? bill.cart
+          : []
+      }
+      billingDetails={{
+        grandTotal: Number(bill?.grandTotal ?? bill?.totalAmount ?? 0)
+      }}
+      customerName={bill?.customerName || ""}
+      customerPhoneNo={bill?.customerPhoneNo || ""}
+      customerAddress={bill?.customerAddress || ""}
+      billDate={
+        bill?.createdAt?.seconds
+          ? bill.createdAt.toDate()
+          : new Date(bill?.createdAt ?? Date.now())
+      }
+      fssaiNo="22425147000929"
+    />
+  ).toBlob();
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `ANNAKSHI-BILL-${String(bill?.invoiceNumber).padStart(3, "0")}.pdf`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
   return (
     <div className="edit-bill-page">
@@ -545,7 +579,11 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 2);
                         className="download-icon"
                         onClick={() => handleEdit(bill)}
                       />
-                     <FaDownload className="delete-icon" onClick={() => generateAllCopiesPDF(bill)} />
+                      <FaDownload
+                      className="download-icon"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleFastDownload(bill)}
+                    />
                     </td>
                   </tr>
                 ))}
