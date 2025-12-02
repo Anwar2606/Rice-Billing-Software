@@ -930,11 +930,11 @@ return (
    onChange={(e) => setCustomerName(e.target.value)}
  />
  <label>Customer Address</label>
- <input
+ {/* <input
    type="text"
    value={customerAddress}
    onChange={(e) => setCustomerAddress(e.target.value)}
- />
+ /> */}
  {/* <label>Customer State</label>
  <input
    type="text"
@@ -1049,7 +1049,7 @@ return (
     }, 500); // AUTO TRIGGER DOWNLOAD
   }}
 >
-  Save & Download Tamil PDF
+Download Bill
 </button>
 
 <PDFDownloadLink
