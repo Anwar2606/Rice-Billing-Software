@@ -3,6 +3,8 @@ import { db } from '../firebase'; // Import the initialized firebase instance
 import { collection, getDocs, addDoc, Timestamp, setDoc, getDoc, doc, updateDoc, query, where } from 'firebase/firestore';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import TamilPDF from "./TamilPDF";
 import './BillingCalculator.css'; // Import the CSS file
 import Navbar from '../Navbar/Navbar';
 import MyLogo from '../assets/annakshi-logo.jpg';
@@ -366,8 +368,10 @@ try {
       saleprice: item.saleprice,
       quantity: item.quantity
     })),
-    createdAt: Timestamp.fromDate(selectedDate),
-    invoiceNumber, // Use the same invoice number
+     createdAt: Timestamp.fromDate(selectedDate),  // ⭐ timestamp
+  invoiceDate: selectedDate.toISOString().slice(0, 10),
+  invoiceNumber,
+   
   });
     console.log('Billing details saved successfully in Firestore');
 } catch (error) {
@@ -425,12 +429,6 @@ doc.setTextColor(0, 0, 0);
  doc.text(`Date: ${formattedDate}`, 150, headerStartY + 5 + lineSpacing);
 doc.setFontSize(9);
 doc.setFont('helvetica', 'bold');
-
-
-// doc.text(`Invoice Number: ${formattedInvoiceNumber}`, 150, headerStartY + 5 + 2 * lineSpacing);
-// doc.text(`Date: ${formattedDate}`, 150, headerStartY + 5 + 3 * lineSpacing);
-// doc.setFontSize(8);
-// doc.text('GSTIN Number:33ABVFS6600E1Z4', 150, headerStartY + 5 + 4 * lineSpacing);
 doc.setFont('helvetica', 'bold');
 
 
@@ -508,16 +506,7 @@ doc.rect(14, customerStartY - 2, 182, customerEndY - customerStartY + 4);
     [{ content: 'Sub Total:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.discountedTotal)}.00`]
   );
 
-  // if (taxOption === 'cgst_sgst') {
-  //   tableBody.push(
-  //     [{ content: 'CGST (9%):', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.cgstAmount)}.00`],
-  //     [{ content: 'SGST (9%):', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.sgstAmount)}.00`]
-  //   );
-  // } else if (taxOption === 'igst') {
-  //   tableBody.push(
-  //     [{ content: 'IGST (18%):', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.igstAmount)}.00`]
-  //   );
-  // }
+
 
 const totalQuantity = cart.reduce((sum, item) => {
   const quantity = parseFloat(item.quantity);
@@ -531,20 +520,6 @@ const totalQuantity = cart.reduce((sum, item) => {
     `${totalQuantity}`
   ]
   );
-  // tableBody.push(
-  //       [
-  //         { content: 'Despatched From:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold', fillColor: '#fff',  } }, // Bottom border for this cell
-  //         { content: despatchedFrom || 'N/A', colSpan: 4, styles: { fontStyle: 'normal', fillColor: '#fff',  } } // Bottom border for this cell
-  //       ],
-  //       [
-  //         { content: 'Despatched To:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold', fillColor: '#fff',  } }, // Bottom border for this cell
-  //         { content: despatchedTo || 'N/A', colSpan: 4, styles: { fontStyle: 'normal', fillColor: '#fff',  } } // Bottom border for this cell
-  //       ],
-  //       [
-  //         { content: 'Transport Name:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold', fillColor: '#fff', } }, // Bottom border for this cell
-  //         { content: transportName || 'N/A', colSpan: 4, styles: { fontStyle: 'normal', fillColor: '#fff',} } // Bottom border for this cell
-  //       ],
-  //     );
 
 doc.autoTable({
   head: [['S.No', 'Product Name', 'Quantity', 'Rate Per Price', 'Total']],
@@ -607,8 +582,6 @@ terms.forEach(term => {
   currentY += lineHeight;
   doc.text(term, boxX + padding, currentY);
 });
-
-// Signature at the same vertical level as last line
 const authSig = 'Authorised Signature';
 const authSigWidth = doc.getTextWidth(authSig);
 const authSigX = boxX + boxWidth - authSigWidth - padding;
@@ -634,309 +607,6 @@ const handleGenerateAllCopies = async () => {
 
   doc.save(`BILL-${invoiceNumber}-25.pdf`);
 };
-
-
-// const handleGenerateAllCopies = async () => {
-//   await saveBillingDetails(manualInvoiceNumber);
-//   transportCopy(manualInvoiceNumber);
-//   // salesCopy(manualInvoiceNumber);
-//   OfficeCopy(manualInvoiceNumber);
-//   Customer(manualInvoiceNumber);
- 
-//   // CustomerCopy(manualInvoiceNumber)
-// };
-
-// const transportCopy = (invoiceNumber) => {
-//   generatePDF('TRANSPORT COPY', invoiceNumber);
-// };
-
-// const salesCopy = (invoiceNumber) => {
-//   generatePDF('SALES COPY', invoiceNumber);
-// };
-
-// const OfficeCopy = (invoiceNumber) => {
-//   generatePDF('OFFICE COPY', invoiceNumber);
-// };
-// const Customer = (invoiceNumber) => {
-//   generatePDF('Customer COPY', invoiceNumber);
-// };
-// const CustomerCopy = async () => {
-//  if (cart.length === 0) {
-//      alert('The cart is empty. Please add items to the cart before saving.');
-//      return; // Exit the function if the cart is empty
-//    }
- 
-//    // Validate the invoice number
-//    const invoiceNumber = manualInvoiceNumber.trim();
-//    if (!invoiceNumber) {
-//      alert('Please enter a valid invoice number.');
-//      return; // Exit the function if the invoice number is empty
-//    }
-//    const billingDocRef = collection(db, 'customerBilling');
-   
-//    try {
-     
-//      await addDoc(billingDocRef, {
-//        ...billingDetails,
-//        customerName,
-//        customerAddress,
-//        customerState,
-//        customerPhoneNo,
-//        customerEmail,
-//        customerGSTIN,
-      
-//        productsDetails: cart.map(item => ({
-//          productId: item.productId,
-//          name: item.name,
-//          saleprice: item.saleprice,
-//          quantity: item.quantity
-//        })),
-//        createdAt: Timestamp.fromDate(selectedDate),
-//        invoiceNumber, // Use the same invoice number
-//      });
-//      console.log('Billing details saved successfully in Firestore');
-//    } catch (error) {
-//      console.error('Error saving billing details: ', error);
-//    }
- 
-//    // Generate and save PDF invoice
-//     const doc = new jsPDF();
-//    const pageWidth = doc.internal.pageSize.getWidth();
-//    const pageHeight = doc.internal.pageSize.getHeight();
-//    const borderMargin = 10;
- 
-//    const drawPageBorder = () => {
-//      doc.setDrawColor(0, 0, 0);
-//      doc.setLineWidth(0.2);
-//      doc.rect(borderMargin, borderMargin, pageWidth - 2 * borderMargin, pageHeight - 2 * borderMargin);
-//    };
- 
-//    drawPageBorder();
- 
-//    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-//                       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-//   const headerTable = [
-//     ['T.M.CRACKERS PARK', '', 'TAX INVOICE'],
-//     ['Address:1/90Z6, Balaji Nagar, Anna Colony', '', 'CUSTOMER COPY'],
-//     ['Vadamamalapuram ', '', `Invoice Number: ${invoiceNumber}`],
-//     ['Thiruthangal - 626130', '', `Date: ${selectedDate.getDate().toString().padStart(2, '0')}-${monthNames[selectedDate.getMonth()]}-${selectedDate.getFullYear()}`],
-//     ['Sivakasi (Zone)', '', 'GSTIN: 33AAVFT8036C1ZZ'],
-//     ['Virudhunagar (Dist)', '', ''],
-//     ['State: 33-Tamil Nadu', '', ''],
-//     ['Phone number: 97514 87277 / 95853 58106', '', '']
-   
-//  ];
- 
-//  const headerStartY = 14;
- 
-//  doc.autoTable({
-//    body: headerTable,
-//    startY: headerStartY,
-//    theme: 'plain',
-//    styles: { fontSize: 9 },
-//    margin: { left: 15, right: 30 },
-//    columnStyles: {
-//      0: { fontStyle: 'bold', cellWidth: 80 },
-//      1: { cellWidth: 37 },
-//      2: { fontStyle: 'bold', halign: 'right', cellWidth: 60 }
-//    },
-//    didDrawPage: drawPageBorder,
-//    didParseCell: function (data) {
-//      if (data.row.index === 0) {
-//        data.cell.styles.textColor = [255, 0, 0];
-//        data.cell.styles.fontSize = 11;
-//        data.cell.styles.fontStyle = 'bold';
-//      }
-//    }
-//  });
- 
-//  // ⬛ Draw full rectangle around the header table
-//  const headerEndY = doc.autoTable.previous.finalY;
-//  const rectX = 14; // Same as left margin
-//  const rectY = headerStartY - 2; // Small padding above
-//  const rectWidth = 182;
-//  const rectHeight = headerEndY - headerStartY + 4; // height + padding
- 
-//  doc.setDrawColor(0, 0, 0);
-//  doc.setLineWidth(0.2);
-//  doc.rect(rectX, rectY, rectWidth, rectHeight); // ⬅️ Rectangle around entire headerTable
- 
- 
-//  let startY = doc.autoTable.previous.finalY + 5;
- 
-//    const customerDetails = [
-//    ['TO', '', 'Account Details', ''], // Fixed: 4 columns
-//    ['Name', customerName, 'A/c Holder Name', 'Gowtham'],
-//    ['Address', customerAddress, 'A/c Number', '231100050309543'],
-//    ['State', customerState, 'Bank Name', 'Tamilnad Mercantile Bank'],
-//    ['Phone', customerPhoneNo, 'Branch', 'Thiruthangal'],
-//    ['GSTIN', customerGSTIN, 'IFSC Code', 'TMBL0000231'],
-//    ['PAN', customerPan, '', '']
-//  ];
- 
- 
-//  doc.autoTable({
-//    body: customerDetails,
-//    startY,
-//    theme: 'grid',
-//    styles: {
-//      fontSize: 9,
-//      textColor: [0, 0, 0],
-//      lineColor: [0, 0, 0],
-//      lineWidth: 0.2
-//    },
-//    columnStyles: {
-//      0: { fontStyle: 'bold', cellWidth: 25 },
-//      1: { cellWidth: 60 },
-//      2: { fontStyle: 'bold', cellWidth: 35 },
-//      3: { cellWidth: 62 }
-//    },
-//    didDrawCell: function (data) {
-//      // Remove top and bottom borders (row lines)
-//      if (data.cell.section === 'body') {
-//        data.cell.styles.lineWidth = {
-//          top: 0,
-//          bottom: 0,
-//          left: 0.2,
-//          right: 0.2
-//        };
-//      }
-//    }
-//  });
- 
- 
- 
- 
- 
-//    startY = doc.autoTable.previous.finalY + 5;
- 
-//    const tableBody = cart.map((item, index) => [
-//      (index + 1).toString(),
-//      item.name,
-//      '3604',
-//      item.quantity.toString(),
-//      `Rs. ${item.saleprice.toFixed(2)}`,
-//      `Rs. ${(item.saleprice * item.quantity).toFixed(2)}`
-//    ]);
- 
-//    const FIXED_TABLE_ROWS = 3;
-//    const usedRows = tableBody.length;
-//    const emptyRows = FIXED_TABLE_ROWS - usedRows - 6;
-//    for (let i = 0; i < emptyRows; i++) {
-//      tableBody.push(['', '', '', '', '', '']);
-//    }
- 
-//     tableBody.push(
-//     [{ content: 'Total Amount:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.totalAmount)}.00`],
-//     [{ content: `Discount (${billingDetails.discountPercentage}%):`, colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } },
-//      `${Math.round(billingDetails.totalAmount * (parseFloat(billingDetails.discountPercentage) / 100)).toFixed(2)}`],
-//     [{ content: 'Sub Total:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.discountedTotal)}.00`]
-//   );
-
-//   if (taxOption === 'cgst_sgst') {
-//     tableBody.push(
-//       [{ content: 'CGST (9%):', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.cgstAmount)}.00`],
-//       [{ content: 'SGST (9%):', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.sgstAmount)}.00`]
-//     );
-//   } else if (taxOption === 'igst') {
-//     tableBody.push(
-//       [{ content: 'IGST (18%):', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.igstAmount)}.00`]
-//     );
-//   }
-
-//   tableBody.push(
-//     [{ content: 'Grand Total:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `${Math.round(billingDetails.grandTotal)}.00`]
-//   );
- 
-//    doc.autoTable({
-//    head: [['S.No', 'Product Name','HSN Code', 'Quantity', 'Rate Per Price', 'Total']],
-//    body: tableBody,
-//    startY,
-//    theme: 'grid',
-//    headStyles: { 
-//      fillColor: [255, 182, 193], 
-//      textColor: [0, 0, 139], 
-//      lineWidth: 0.2,
-//      lineColor: [100, 100, 100] // light gray border
-//    },
-//    bodyStyles: { 
-//      fillColor: [255, 255, 255], 
-//      textColor: [0, 0, 0], 
-//      lineWidth: 0.2,
-//      lineColor: [0, 0, 0] // same border color for body
-//    },
-//    alternateRowStyles: { fillColor: [245, 245, 245] },
-//    didDrawPage: drawPageBorder
-//  });
- 
- 
-//    startY = doc.autoTable.previous.finalY + 8;
-//    const grandTotalInWords = numberToWords(billingDetails.grandTotal);
-//    doc.setFont('helvetica', 'bold');
-//    doc.setFontSize(10);
-//    doc.setTextColor(0, 0, 139);
-//    doc.text(`Rupees: ${grandTotalInWords}`, borderMargin + 5, startY);
- 
-//    startY += 10;
-//    const terms = [
-//    '1. Goods once sold will not be taken back.',
-//    '2. All matters Subject to "Sivakasi" jurisdiction only.'
-//  ];
- 
-//  doc.setFontSize(10);
-//  doc.setTextColor(0, 0, 0);
- 
-//  // Padding settings
-//  const padding = 6;
-//  const lineHeight = 6;
- 
-//  const boxX = borderMargin + 4;
-//  const boxY = startY;
-//  const boxWidth = pageWidth - 2 * (borderMargin + 4);
- 
-//  // Estimate box height: padding top + title + each line + signature + padding bottom
-//  const contentHeight = padding + 6 + terms.length * lineHeight + 10 + padding;
-//  const boxHeight = contentHeight;
- 
-//  // Draw rectangle border with full padding
-//  doc.setDrawColor(0, 0, 0);
-//  doc.setLineWidth(0.2);
-//  doc.rect(boxX, boxY, boxWidth, boxHeight);
- 
-//  // Title
-//  let currentY = boxY + padding;
-//  doc.setFont('helvetica', 'bold');
-//  doc.text('Terms & Conditions', boxX + padding, currentY);
- 
-//  // Terms list
-//  // Only show the first term normally
-//  doc.setFont('helvetica', 'normal');
-//  currentY += 6;
-//  doc.text(terms[0], boxX + padding, currentY);
- 
-//  // Now draw the second term and signature on the same line
-//  currentY += lineHeight;
-//  const secondTerm = terms[1];
-//  const authSig = 'Authorised Signature';
- 
-//  doc.setFont('helvetica', 'normal');
-//  doc.text(secondTerm, boxX + padding, currentY);
- 
-//  // Signature on the same line, aligned to the right
-//  doc.setFont('helvetica', 'bold');
-//  const authSigWidth = doc.getTextWidth(authSig);
-//  const authSigX = boxX + boxWidth - authSigWidth - padding;
-//  doc.text(authSig, authSigX, currentY);
- 
-
-
-// doc.save(`invoice_${invoiceNumber}_CUSTOMERCOPY.pdf`);
-
-// };
-
-
-
 const handleSearch = (event) => {
 const term = event.target.value.toLowerCase();
 setSearchTerm(term);
@@ -1364,9 +1034,54 @@ return (
   Add Custom Product
 </button> */}
 
-  <button className="btn btn-success" onClick={handleGenerateAllCopies}>
-    Download All Copies
-  </button>
+<button
+  className="btn btn-primary"
+  onClick={async () => {
+    const invoiceNumber = manualInvoiceNumber.trim();
+    if (!invoiceNumber || cart.length === 0) {
+      alert("Please enter invoice number and add items to cart.");
+      return;
+    }
+
+    await saveBillingDetails(invoiceNumber); // <-- SAVE FIRST
+    setTimeout(() => {
+      document.getElementById("tamil-pdf-download").click();
+    }, 500); // AUTO TRIGGER DOWNLOAD
+  }}
+>
+  Save & Download Tamil PDF
+</button>
+
+<PDFDownloadLink
+  id="tamil-pdf-download"
+  style={{ display: "none" }}
+  document={
+    <TamilPDF
+      invoiceNumber={manualInvoiceNumber}
+      cart={cart}
+      billingDetails={billingDetails}
+
+      customerName={customerName}
+      customerAddress={customerAddress}
+      customerPhoneNo={customerPhoneNo}
+
+      despatchedFrom={despatchedFrom}
+      despatchedTo={despatchedTo}
+      transportName={transportName}
+      transportGSTIN={transportGSTIN}
+      lrNo={lrNo}
+      transportDate={transportDate}
+
+      // ⭐⭐ SEND SELECTED DATE TO PDF ⭐⭐
+      billDate={selectedDate}
+    />
+  }
+  fileName={`bill-${manualInvoiceNumber}.pdf`}
+>
+  {({ loading }) => (loading ? "..." : "Download")}
+</PDFDownloadLink>
+
+
   <button 
     className="btn btn-info" 
     style={{ display: "none" }} 
